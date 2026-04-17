@@ -1,0 +1,25 @@
+/*
+Author: Siri S.
+Company: Synergix Labs
+Created: 10th April 2026
+Last Modified: 10th April 2026
+Tags: 
+Description: Search results in displaying processes running with elevated privileges
+Product URL: https://www.synergix.com/LEDR
+*/
+
+AppEvents
+| where TimeGenerated >= ago(48h)
+    and Properties.EventId == "1"
+    and Properties.ParentImage has "Synergix.LEDR.LaunchPad.exe"
+    and Properties.IntegrityLevel == "High" 
+| project
+    TimeGenerated,
+    MachineName=tostring(Properties.MachineName),
+    User=tostring(Properties.User),
+    ParentUser=tostring(Properties.ParentUser),
+    Image=tostring(Properties.Image),
+    CommandLine=tostring(Properties.CommandLine),
+    IntegrityLevel=tostring(Properties.IntegrityLevel),
+    ParentImage=tostring(Properties.ParentImage)
+| sort by TimeGenerated desc
