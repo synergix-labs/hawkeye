@@ -1,0 +1,17 @@
+/*
+Author: Siri S.
+Company: Synergix Labs
+Created: 7th April 2026
+Last Modified: 7th April 2026
+Tags: 
+Description: Search results in SYNERGIX LEDR managed endpoints that send heartbeat signal to the backend services
+Product URL: https://www.synergix.com/LEDR
+*/
+
+AppEvents 
+  | where Name == "SystemSysmon" 
+  | extend EventId = toint(Properties.EventId), Machine = tostring(Properties.MachineName) 
+  | where EventId == 22 
+  | where tostring(Properties.QueryName) contains "contoso[.]local"  // Replace this FQDN, as appropriate for your environment.
+  | summarize DNSCount = count() by bin(TimeGenerated, 10m), Machine 
+  | render timechart
