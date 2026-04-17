@@ -1,7 +1,0 @@
-# Overview
-
-# Requirements
-
-# Instructions
-
-# References
