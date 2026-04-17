@@ -1,0 +1,15 @@
+/*
+Author: Siri S.
+Company: Synergix Labs
+Created: 16th April 2026
+Last Modified: 16th April 2026
+Tags: 
+Description: Detecting AD Unicode Abuse with SYNERGIX LEDR and KQL
+Product URL: https://www.synergix.com/LEDR
+*/
+
+AppEvents
+| where Properties.EventId == 5136
+| extend AttributeValue_ = tostring(Properties.AttributeValue)
+| where Properties.AttributeLDAPDisplayName == "servicePrincipalName"
+| where Properties.AttributeValue matches regex @"[^\x00-\x7F]"
