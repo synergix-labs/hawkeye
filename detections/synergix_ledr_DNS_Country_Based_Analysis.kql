@@ -1,0 +1,31 @@
+/*
+Author: Siri S.
+Company: Synergix Labs
+Created: 18th June 2026
+Last Modified: 18th June 2026
+Tags: 
+Description: Detects DNS queries (Sysmon Event ID 22) and classifies domains based on country-specific TLDs.
+Product URL: https://www.synergix.com/LEDR
+*/
+
+AppEvents
+| where Properties.EventId == 22
+| extend QueryName = tostring(Properties.QueryName)
+| extend DeviceName = tostring(Properties.MachineName)
+| extend Country =
+    case(
+        QueryName matches regex @".*\.in$", "India",
+        QueryName matches regex @".*\.co\.uk$|.*\.uk$", "United Kingdom",
+        QueryName matches regex @".*\.jp$", "Japan",
+        QueryName matches regex @".*\.com\.au$|.*\.au$", "Australia",
+        QueryName matches regex @".*\.ir$", "Iran",
+        QueryName matches regex @".*\.pk$", "Pakistan",
+        QueryName matches regex @".*\.co\.za$|.*\.za$", "South Africa",
+        "Unknown / Generic"
+    )
+| summarize
+    EventCount = count(),
+    UniqueDomains = dcount(QueryName),
+    Domains = make_set(QueryName, 10)
+    by Country, DeviceName
+| order by EventCount desc
